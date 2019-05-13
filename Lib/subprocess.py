@@ -403,15 +403,17 @@ class CompletedProcess(object):
 
     Attributes:
       args: The list or str args passed to run().
+      pid: The prior pid of the completed process.
       returncode: The exit code of the process, negative for signals.
       stdout: The standard output (None if not captured).
       stderr: The standard error (None if not captured).
     """
-    def __init__(self, args, returncode, stdout=None, stderr=None):
+    def __init__(self, args, returncode, stdout=None, stderr=None, pid=None):
         self.args = args
         self.returncode = returncode
         self.stdout = stdout
         self.stderr = stderr
+        self.pid = pid
 
     def __repr__(self):
         args = ['args={!r}'.format(self.args),
@@ -420,6 +422,8 @@ class CompletedProcess(object):
             args.append('stdout={!r}'.format(self.stdout))
         if self.stderr is not None:
             args.append('stderr={!r}'.format(self.stderr))
+        if self.pid is not None:
+            args.append('pid={!r}'.format(self.stderr))
         return "{}({})".format(type(self).__name__, ', '.join(args))
 
     def check_returncode(self):
@@ -486,7 +490,7 @@ def run(*popenargs,
         if check and retcode:
             raise CalledProcessError(retcode, process.args,
                                      output=stdout, stderr=stderr)
-    return CompletedProcess(process.args, retcode, stdout, stderr)
+    return CompletedProcess(process.args, retcode, stdout, stderr, pid)
 
 
 def list2cmdline(seq):
